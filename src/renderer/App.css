@@ -1,0 +1,13 @@
+@import '~antd/dist/antd.css';
+
+body {
+  position: relative;
+  color: white;
+  height: 100vh;
+  background: #cedfd9;
+  font-family: sans-serif;
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
