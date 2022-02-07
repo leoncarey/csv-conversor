@@ -3,6 +3,7 @@ import { Box, Text, ChakraProvider } from '@chakra-ui/react';
 
 import { Upload, Button, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+import FileDownloader from 'renderer/controllers/fileDownloader';
 
 const Home: React.FC = () => {
   const [error, setError] = useState('');
@@ -10,26 +11,15 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [fileList, setFilelist] = useState([]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 5000);
-
-    // const formData = new FormData();
-    // fileList.forEach((file: any) => {
-    //   formData.append('files[]', file);
-    // });
+    await FileDownloader.readFile(fileList[0]);
+    setLoading(false);
   };
 
   const options = {
-    onRemove: (file: any) => {
-      const index = fileList.indexOf(file as never);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-
-      setFilelist(newFileList);
+    onRemove: () => {
+      setFilelist([]);
     },
     beforeUpload: (file: any) => {
       setFilelist([]);
