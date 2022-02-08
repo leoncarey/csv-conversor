@@ -110,7 +110,9 @@ const _filterColumns = (
 
     for (const column of columnsFilter) {
       if (objectData[column] === undefined)
-        throw new Error(`Coluna informada não existe: ${column}`);
+        throw new Error(
+          `Coluna informada não existe no cabeçalho do arquivo enviado: ${column}`
+        );
 
       finalObject[columnFiltersOutput[columnsFilter.indexOf(column)]] =
         objectData[column];
