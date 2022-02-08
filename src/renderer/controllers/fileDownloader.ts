@@ -2,25 +2,30 @@ import dayjs from 'dayjs';
 
 class FileDownloader {
   static async processFile(delimiter: string, file: any, columnsFilter: any) {
-    try {
+    return new Promise((resolve) => {
       const fileReader = new FileReader();
-      fileReader.onload = (e) =>
-        _loadFileFilterProcesso(e, delimiter, columnsFilter);
+
+      fileReader.onload = (e) => {
+        try {
+          _loadFileFilterProcesso(e, delimiter, columnsFilter);
+
+          resolve({
+            success: true,
+            message: '',
+          });
+        } catch (error: any) {
+          console.error('ERROR ON PROCESS ===> ', error);
+
+          resolve({
+            success: false,
+            message:
+              'Ocorreu algum erro no processamento do arquivo. Por favor, verifique o mesmo e tente novamente.',
+          });
+        }
+      };
+
       fileReader.readAsText(file);
-
-      return {
-        success: true,
-        message: '',
-      };
-    } catch (error: any) {
-      console.error('ERROR ON PROCESS ===> ', error);
-
-      return {
-        success: false,
-        message:
-          'Ocorreu algum erro no processamento do arquivo. Por favor, verifique o mesmo e tente novamente.',
-      };
-    }
+    });
   }
 }
 

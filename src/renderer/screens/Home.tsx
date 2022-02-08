@@ -9,7 +9,6 @@ import FileDownloader from 'renderer/controllers/fileDownloader';
 const { Option } = Select;
 
 const Home: React.FC = () => {
-  const [error, setError] = useState('');
   const toast = useToast();
 
   const [loading, setLoading] = useState(false);
@@ -28,13 +27,13 @@ const Home: React.FC = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    const response = await FileDownloader.processFile(
+    const { success, message }: any = await FileDownloader.processFile(
       delimiter,
       fileList[0],
       columnFilters
     );
 
-    if (response.success) {
+    if (success) {
       toast({
         title: 'Arquivo criado!',
         description: 'Verifique o local da exportação.',
@@ -43,7 +42,13 @@ const Home: React.FC = () => {
         isClosable: true,
       });
     } else {
-      setError(response.message);
+      toast({
+        title: 'Ops!',
+        description: message,
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      });
     }
 
     setLoading(false);
@@ -121,14 +126,6 @@ const Home: React.FC = () => {
           <Button icon={<UploadOutlined />}>Selecione o arquivo...</Button>
         </Upload>
       </Box>
-
-      {error !== '' && (
-        <Box w="100%" mt={1}>
-          <Text fontSize="xs" color="red.300">
-            {error}
-          </Text>
-        </Box>
-      )}
 
       <Button
         type="primary"

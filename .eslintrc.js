@@ -15,6 +15,7 @@ module.exports = {
     'no-restricted-syntax': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'react/no-array-index-key': 'off',
+    '@typescript-eslint/no-shadow': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
