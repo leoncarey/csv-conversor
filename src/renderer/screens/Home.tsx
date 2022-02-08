@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Box, Text, useToast } from '@chakra-ui/react';
 
-import { Upload, Button, message, Select } from 'antd';
+import { Upload, Button, message, Select, Divider, Tooltip } from 'antd';
 
-import { UploadOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import FileDownloader from 'renderer/controllers/fileDownloader';
 
 const { Option } = Select;
@@ -20,17 +20,22 @@ const Home: React.FC = () => {
     'EMAIL',
   ]);
 
-  const childrenSelectColumns = [];
-  for (const column of columnFilters) {
-    childrenSelectColumns.push(<Option key={column}>{column}</Option>);
-  }
+  const [columnFiltersOutput, setColumnFiltersOutput] = useState([
+    'CPF',
+    'NOME',
+    'EMAIL',
+  ]);
+
+  const childrenSelectColumns = _processColumns(columnFilters);
+  const childrenSelectColumnsOutput = _processColumns(columnFiltersOutput);
 
   const handleSubmit = async () => {
     setLoading(true);
     const { success, message }: any = await FileDownloader.processFile(
       delimiter,
       fileList[0],
-      columnFilters
+      columnFilters,
+      columnFiltersOutput
     );
 
     if (success) {
@@ -59,6 +64,7 @@ const Home: React.FC = () => {
   };
 
   const handleAddColumn = (value: any) => setColumnFilters(value);
+  const handleAddColumnOutput = (value: any) => setColumnFiltersOutput(value);
 
   const optionsUploader = {
     onRemove: () => {
@@ -82,13 +88,26 @@ const Home: React.FC = () => {
 
   return (
     <Box w="100%" h="100%">
-      <Text fontSize="40px">Filtrador de CSV</Text>
+      <Text fontSize="40px">Conversor de CSV</Text>
       <Text>
-        Configure os filtros para o processamento do arquivo e envie
+        Configure os filtros para o processamento e envie
         <br />
         seu arquivo CSV/TXT para iniciar a conversão.
       </Text>
 
+      <Divider orientation="left" orientationMargin="0">
+        Configurações de input
+        <Tooltip
+          placement="topLeft"
+          title="São as configurações referentes ao arquivo de entrada. Aquele que você irá importar."
+        >
+          <InfoCircleOutlined
+            style={{ marginLeft: 10, cursor: 'pointer', color: '#008dff' }}
+          />
+        </Tooltip>
+      </Divider>
+
+      {/* Delimiter */}
       <Box mt={5}>
         <Text mb={1}>Escolha o delimitador</Text>
 
@@ -107,8 +126,13 @@ const Home: React.FC = () => {
         </Select>
       </Box>
 
+      {/* Input Columns */}
       <Box mt={5}>
-        <Text mb={1}>Digite o nome das colunas que deseja filtrar</Text>
+        <Text mb={1}>
+          Digite o nome das colunas do cabeçalho do arquivo que
+          <br />
+          deseja filtrar
+        </Text>
 
         <Select
           mode="tags"
@@ -121,10 +145,42 @@ const Home: React.FC = () => {
         </Select>
       </Box>
 
+      {/* File input */}
       <Box mt={4}>
         <Upload {...optionsUploader}>
           <Button icon={<UploadOutlined />}>Selecione o arquivo...</Button>
         </Upload>
+      </Box>
+
+      <Divider orientation="left" orientationMargin="0">
+        Configurações de output
+        <Tooltip
+          placement="topLeft"
+          title="São as configurações referentes ao arquivo de saída. Aquele que você irá realizar o download no final do processo."
+        >
+          <InfoCircleOutlined
+            style={{ marginLeft: 10, cursor: 'pointer', color: '#008dff' }}
+          />
+        </Tooltip>
+      </Divider>
+
+      {/* Output Columns */}
+      <Box mt={5}>
+        <Text mb={1}>
+          Digite o nome das colunas do cabeçalho que deseja modificar, de forma
+          <br />
+          respectiva em relação às colunas de entrada
+        </Text>
+
+        <Select
+          mode="tags"
+          style={{ width: '100%' }}
+          defaultValue={columnFiltersOutput}
+          placeholder="Digite o nome da coluna e tecle Enter"
+          onChange={handleAddColumnOutput}
+        >
+          {childrenSelectColumnsOutput}
+        </Select>
       </Box>
 
       <Button
@@ -139,6 +195,16 @@ const Home: React.FC = () => {
       </Button>
     </Box>
   );
+};
+
+const _processColumns = (columns: any) => {
+  const childrenSelectColumns = [];
+
+  for (const column of columns) {
+    childrenSelectColumns.push(<Option key={column}>{column}</Option>);
+  }
+
+  return childrenSelectColumns;
 };
 
 export default Home;

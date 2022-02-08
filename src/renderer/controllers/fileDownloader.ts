@@ -1,13 +1,23 @@
 import dayjs from 'dayjs';
 
 class FileDownloader {
-  static async processFile(delimiter: string, file: any, columnsFilter: any) {
+  static async processFile(
+    delimiter: string,
+    file: any,
+    columnsFilter: any,
+    columnFiltersOutput: any
+  ) {
     return new Promise((resolve) => {
       const fileReader = new FileReader();
 
       fileReader.onload = (e) => {
         try {
-          _loadFileFilterProcesso(e, delimiter, columnsFilter);
+          _loadFileFilterProcesso(
+            e,
+            delimiter,
+            columnsFilter,
+            columnFiltersOutput
+          );
 
           resolve({
             success: true,
@@ -32,11 +42,16 @@ class FileDownloader {
 const _loadFileFilterProcesso = (
   e: any,
   delimiter: string,
-  columnsFilter: any
+  columnsFilter: any,
+  columnFiltersOutput: any
 ) => {
   const text = e.target?.result;
   const arrayData = _parseStringToArray(text, delimiter);
-  const finalData = _filterColumns(arrayData, columnsFilter);
+  const finalData = _filterColumns(
+    arrayData,
+    columnsFilter,
+    columnFiltersOutput
+  );
   const finalContent = _parseArrayToString(finalData);
 
   _generateNewFile(finalContent);
@@ -81,14 +96,19 @@ const _parseArrayToString = (arrayData: any) => {
   return finalContent;
 };
 
-const _filterColumns = (arrayData: any, columnsFilter: any) => {
+const _filterColumns = (
+  arrayData: any,
+  columnsFilter: any,
+  columnFiltersOutput: any
+) => {
   const finalData = [];
 
   for (const objectData of arrayData) {
     const finalObject: any = {};
 
     for (const column of columnsFilter) {
-      finalObject[column] = objectData[column];
+      finalObject[columnFiltersOutput[columnsFilter.indexOf(column)]] =
+        objectData[column];
     }
 
     finalData.push(finalObject);
