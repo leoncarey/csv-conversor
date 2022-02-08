@@ -83,11 +83,12 @@ const _parseStringToArray = (str: any, delimiter = ';') => {
 
 const _parseArrayToString = (arrayData: any) => {
   const headers = Object.keys(arrayData[0]);
-  let finalContent = `${headers.join(';')};\n`;
+  let finalContent = `${headers.join(';')}\n`;
 
   arrayData.forEach((element: any) => {
-    headers.forEach((column: any) => {
-      finalContent += `${element[column]};`;
+    headers.forEach((column: any, index: number) => {
+      const delimiterElement = index !== headers.length - 1 ? ';' : '';
+      finalContent += `${element[column]}${delimiterElement}`;
     });
 
     finalContent += '\n';
