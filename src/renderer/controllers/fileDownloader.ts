@@ -24,12 +24,13 @@ class FileDownloader {
             message: '',
           });
         } catch (error: any) {
-          console.error('ERROR ON PROCESS ===> ', error);
+          const message = error.message
+            ? error.message
+            : 'Ocorreu algum erro no processamento do arquivo. Por favor, verifique o mesmo e tente novamente.';
 
           resolve({
             success: false,
-            message:
-              'Ocorreu algum erro no processamento do arquivo. Por favor, verifique o mesmo e tente novamente.',
+            message,
           });
         }
       };
@@ -108,6 +109,9 @@ const _filterColumns = (
     const finalObject: any = {};
 
     for (const column of columnsFilter) {
+      if (objectData[column] === undefined)
+        throw new Error(`Coluna informada não existe: ${column}`);
+
       finalObject[columnFiltersOutput[columnsFilter.indexOf(column)]] =
         objectData[column];
     }
