@@ -109,7 +109,7 @@ const Home: React.FC = () => {
 
       {/* Delimiter */}
       <Box mt={5}>
-        <Text mb={1}>Escolha o delimitador</Text>
+        <Text mb={1}>Escolha o delimitador utilizado no arquivo importado</Text>
 
         <Select
           style={{ width: '100%' }}
@@ -169,7 +169,7 @@ const Home: React.FC = () => {
         <Text mb={1}>
           Digite o nome das colunas do cabeçalho que deseja modificar, de forma
           <br />
-          respectiva em relação às colunas de entrada
+          respectiva em relação as colunas de entrada
         </Text>
 
         <Select
