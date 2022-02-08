@@ -58,7 +58,9 @@ const _parseStringToArray = (str: any, delimiter = ';') => {
     })
     .filter(
       (element: any) =>
-        element[headers[0]] !== undefined && element[headers[0]] !== ''
+        element[headers[0]] !== '' &&
+        element[headers[0]] !== '\r' &&
+        element[headers[0]] !== undefined
     );
 
   return arrayData;
