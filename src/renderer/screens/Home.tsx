@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Text, ChakraProvider } from '@chakra-ui/react';
+import { Box, Text, useToast } from '@chakra-ui/react';
 
 import { Upload, Button, message, Select } from 'antd';
 
@@ -10,6 +10,7 @@ const { Option } = Select;
 
 const Home: React.FC = () => {
   const [error, setError] = useState('');
+  const toast = useToast();
 
   const [loading, setLoading] = useState(false);
   const [delimiter, setDelimiter] = useState(';');
@@ -27,7 +28,24 @@ const Home: React.FC = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    await FileDownloader.processFile(delimiter, fileList[0], columnFilters);
+    const response = await FileDownloader.processFile(
+      delimiter,
+      fileList[0],
+      columnFilters
+    );
+
+    if (response.success) {
+      toast({
+        title: 'Arquivo criado!',
+        description: 'Verifique o local da exportação.',
+        status: 'success',
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      setError(response.message);
+    }
+
     setLoading(false);
   };
 
@@ -58,73 +76,71 @@ const Home: React.FC = () => {
   };
 
   return (
-    <ChakraProvider>
-      <Box w="100%" h="100%">
-        <Text fontSize="40px">Filtrador de CSV</Text>
-        <Text>
-          Configure os filtros para o processamento do arquivo e envie
-          <br />
-          seu arquivo CSV/TXT para iniciar a conversão.
-        </Text>
+    <Box w="100%" h="100%">
+      <Text fontSize="40px">Filtrador de CSV</Text>
+      <Text>
+        Configure os filtros para o processamento do arquivo e envie
+        <br />
+        seu arquivo CSV/TXT para iniciar a conversão.
+      </Text>
 
-        <Box mt={5}>
-          <Text mb={1}>Escolha o delimitador</Text>
+      <Box mt={5}>
+        <Text mb={1}>Escolha o delimitador</Text>
 
-          <Select
-            style={{ width: '100%' }}
-            defaultValue=";"
-            placeholder="Escolha o delimitador"
-            optionFilterProp="children"
-            onChange={changeDelimiter}
-            filterOption={(input, option: any) =>
-              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            <Option value=";">Ponto e vírgula(;)</Option>
-            <Option value=",">Vírgula (,)</Option>
-          </Select>
-        </Box>
-
-        <Box mt={5}>
-          <Text mb={1}>Digite o nome das colunas que deseja filtrar</Text>
-
-          <Select
-            mode="tags"
-            style={{ width: '100%' }}
-            defaultValue={columnFilters}
-            placeholder="Digite o nome da coluna e tecle Enter"
-            onChange={handleAddColumn}
-          >
-            {childrenSelectColumns}
-          </Select>
-        </Box>
-
-        <Box mt={4}>
-          <Upload {...optionsUploader}>
-            <Button icon={<UploadOutlined />}>Selecione o arquivo...</Button>
-          </Upload>
-        </Box>
-
-        {error !== '' && (
-          <Box w="100%" mt={1}>
-            <Text fontSize="xs" color="red.300">
-              {error}
-            </Text>
-          </Box>
-        )}
-
-        <Button
-          type="primary"
-          size="large"
-          disabled={fileList.length === 0}
-          loading={loading && columnFilters.length !== 0}
-          style={{ marginTop: 30 }}
-          onClick={handleSubmit}
+        <Select
+          style={{ width: '100%' }}
+          defaultValue=";"
+          placeholder="Escolha o delimitador"
+          optionFilterProp="children"
+          onChange={changeDelimiter}
+          filterOption={(input, option: any) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
         >
-          Processar arquivo
-        </Button>
+          <Option value=";">Ponto e vírgula(;)</Option>
+          <Option value=",">Vírgula (,)</Option>
+        </Select>
       </Box>
-    </ChakraProvider>
+
+      <Box mt={5}>
+        <Text mb={1}>Digite o nome das colunas que deseja filtrar</Text>
+
+        <Select
+          mode="tags"
+          style={{ width: '100%' }}
+          defaultValue={columnFilters}
+          placeholder="Digite o nome da coluna e tecle Enter"
+          onChange={handleAddColumn}
+        >
+          {childrenSelectColumns}
+        </Select>
+      </Box>
+
+      <Box mt={4}>
+        <Upload {...optionsUploader}>
+          <Button icon={<UploadOutlined />}>Selecione o arquivo...</Button>
+        </Upload>
+      </Box>
+
+      {error !== '' && (
+        <Box w="100%" mt={1}>
+          <Text fontSize="xs" color="red.300">
+            {error}
+          </Text>
+        </Box>
+      )}
+
+      <Button
+        type="primary"
+        size="large"
+        disabled={fileList.length === 0}
+        loading={loading && columnFilters.length !== 0}
+        style={{ marginTop: 30 }}
+        onClick={handleSubmit}
+      >
+        Processar arquivo
+      </Button>
+    </Box>
   );
 };
 
