@@ -1,25 +1,87 @@
+import dayjs from 'dayjs';
+
 class FileDownloader {
-  static async readFile(file: any) {
+  static async processFile(delimiter: string, file: any, columnsFilter: any) {
     const fileReader = new FileReader();
-
-    fileReader.onload = (e) => {
-      const text = e.target?.result;
-      console.info('TEXT ===================================> ', text);
-    };
-
+    fileReader.onload = (e) =>
+      _loadFileFilterProcesso(e, delimiter, columnsFilter);
     fileReader.readAsText(file);
-
-    // const content = "File content to save";
-    // const element = document.createElement("a");
-    // const file = new Blob([content], {type: "text/plain"});
-    // element.href = URL.createObjectURL(file);
-    // element.download = "file.txt";
-    // element.click();
-  }
-
-  static createDownloader() {
-    // const fileStream = fs.createWriteStream('');
   }
 }
+
+const _loadFileFilterProcesso = (
+  e: any,
+  delimiter: string,
+  columnsFilter: any
+) => {
+  const text = e.target?.result;
+  const arrayData = _parseStringToArray(text, delimiter);
+  const finalData = _filterColumns(arrayData, columnsFilter);
+  const finalContent = _parseArrayToString(finalData);
+
+  _generateNewFile(finalContent);
+};
+
+const _parseStringToArray = (str: any, delimiter = ';') => {
+  const headers = str.slice(0, str.indexOf('\n')).split(delimiter);
+  const rows = str.slice(str.indexOf('\n') + 1).split('\n');
+
+  const arrayData = rows
+    .map((row: any) => {
+      const values = row.split(delimiter);
+      const element = headers.reduce((object: any, header: any, index: any) => {
+        object[header.replace('\r', '')] = values[index];
+        return object;
+      }, {});
+
+      return element;
+    })
+    .filter(
+      (element: any) =>
+        element[headers[0]] !== undefined && element[headers[0]] !== ''
+    );
+
+  return arrayData;
+};
+
+const _parseArrayToString = (arrayData: any) => {
+  const headers = Object.keys(arrayData[0]);
+  let finalContent = `${headers.join(';')};\n`;
+
+  arrayData.forEach((element: any) => {
+    headers.forEach((column: any) => {
+      finalContent += `${element[column]};`;
+    });
+
+    finalContent += '\n';
+  });
+
+  return finalContent;
+};
+
+const _filterColumns = (arrayData: any, columnsFilter: any) => {
+  const finalData = [];
+
+  for (const objectData of arrayData) {
+    const finalObject: any = {};
+
+    for (const column of columnsFilter) {
+      finalObject[column] = objectData[column];
+    }
+
+    finalData.push(finalObject);
+  }
+
+  return finalData;
+};
+
+const _generateNewFile = (finalContent: string) => {
+  const element = document.createElement('a');
+  const file = new Blob([finalContent], { type: 'text/csv' });
+  element.href = URL.createObjectURL(file);
+  element.download = `planilha-filtrada-${dayjs().format('DD-MM-YYYY')}.csv`;
+  element.click();
+  element.remove();
+};
 
 export default FileDownloader;

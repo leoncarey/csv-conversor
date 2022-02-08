@@ -9,6 +9,12 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'react/no-unescaped-entities': 'off',
     'react/jsx-props-no-spreading': 'off',
+    'no-underscore-dangle': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/naming-convention': 'off',
+    'no-restricted-syntax': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    'react/no-array-index-key': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
